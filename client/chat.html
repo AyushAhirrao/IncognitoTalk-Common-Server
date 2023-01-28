@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale = 1.0, user-scalable = no">
+
+  <!-- favicon -->
+  <link rel="shortcut icon" href="assets/favicon/favicon.png" type="image/x-icon">
+
+
+  <!-- fonts  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- styles -->
+  <link rel="stylesheet" href="styles/globals.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/prompt.css">
+  <link rel="stylesheet" href="styles/animations.css">
+  <link rel="stylesheet" href="styles/meta_data.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+
+  <!-- scripts  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script defer src="scripts/client.js" defer></script>
+
+  <title>IncognitoTalk</title>
+</head>
+
+<body>
+
+  <div id="root">
+    <!-- nick name prompt on load -->
+    <div class="nick-name-prompt">
+      <label for="input-nick-name-prompt">Enter a Nick Name</label>
+      <input autofocus type="text" id="input-nick-name-prompt">
+    </div>
+
+    <!-- decryption Key -->
+    <div class="decryption-key-prompt">
+      <label for="input-decryption-key-prompt">Decryption Key</label>
+      <input type="text" id="input-decryption-key-prompt" value="IT-Common-Server007" disabled="true">
+    </div>
+
+    <!-- main app body -->
+    <div class="container">
+
+      <div id="chats" onmouseover="this.style.overflow='auto'" onmouseout="this.style.overflow='hidden'"></div>
+
+      <div class="prompt">
+        <div class="tag-elements-wrapper">
+          <ul id="tags"></ul>
+        </div>
+        <textarea rows="1" autofocus type="text" id="input-send-message" autocomplete="off"></textarea>
+        <script>
+          document.getElementById("input-send-message").addEventListener("keydown", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              sendMessage();
+            } else if (event.key === "Enter" && event.shiftKey) {
+            }
+          });
+        </script>
+        <button id="send-btn" type="submit" onclick="sendMessage();">Send</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+</html>

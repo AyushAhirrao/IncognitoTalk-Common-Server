@@ -106,8 +106,6 @@ async function updateNicknames(message) {
   // remove all duplicate nicknames 
   nicknames = [...new Set(nicknames)];
 
-  console.log(typeof (nicknames))
-
 }
 
 

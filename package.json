@@ -4,11 +4,12 @@
   "description": "",
   "main": "server/socket-server.js",
   "scripts": {
-    "test": "npm install"
+    "install": "npm install",
+    "start": "node server/socket-server.js"
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "crypto-js": "^4.1.1",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",

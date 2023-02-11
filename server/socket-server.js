@@ -17,11 +17,6 @@ const wss = new WebSocket.Server({
   path: '/socket'
 });
 
-// set server status
-fs.writeFile('server/serverStatus.txt', ("server-opened"), (err) => {
-  if (err) throw err;
-});
-
 const clients = []; // Create an array to store connected clients
 
 let nicknames = []; // array on nicknames of joined clients to server 

@@ -70,7 +70,7 @@ app.use(express.static('client/'));
 // host client 
 app.get('/', (req, res) => {
   // validate server status 
-  const serverStatus = fs.readFileSync('serverStatus.txt', 'utf8').toString(); // the decryption key of server 
+  const serverStatus = "server-opened"; // the decryption key of server 
 
   // if server status is closed
   if (serverStatus == 'server-closed') {

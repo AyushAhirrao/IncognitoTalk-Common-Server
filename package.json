@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/socket-server.js",
   "scripts": {
-    "install": "npm install"
+    "install": "if [ ! -d node_modules ]; then npm install; fi",
   },
   "author": "",
   "license": "ISC",

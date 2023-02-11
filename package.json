@@ -2,7 +2,7 @@
   "name": "incognitotalk-common-server",
   "version": "1.0.0",
   "description": "",
-  "main": "server/socket-server.js",
+  "main": "npm install && server/socket-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

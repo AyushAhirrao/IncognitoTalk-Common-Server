@@ -4,8 +4,7 @@
   "description": "",
   "main": "server/socket-server.js",
   "scripts": {
-    "install": "npm install",
-    "start": "node server/socket-server.js"
+    "install": "npm install"
   },
   "author": "",
   "license": "ISC",

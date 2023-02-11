@@ -12,7 +12,7 @@ const PROTOCOL = SOCKETLINK.startsWith("https") ? "wss://" : "ws://";
 let socket;
 
 async function initializeWebSocket() {
-  socket = new WebSocket(`${PROTOCOL}${SOCKETLINK}socket`);
+  socket = new WebSocket(`wss://${SOCKETLINK}socket`);
 
   const chatBox = document.getElementById("chats");
 

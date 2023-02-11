@@ -1,12 +1,18 @@
-// socket server link
-const socketLink = 'incognitotalk-common-server.onrender.com';
+// address/url of webpage
+const URL = window.location.href;
+
+// get url (remove http:// or https://)
+const SOCKETLINK = URL.split("://")[1];
+
+// get the protocol of the website (http or https)
+const PROTOCOL = SOCKETLINK.startsWith("https") ? "wss://" : "ws://";
 
 
 // websocket server 
 let socket;
 
 async function initializeWebSocket() {
-  socket = new WebSocket(`wss://${socketLink}`);
+  socket = new WebSocket(`${PROTOCOL}${SOCKETLINK}socket`);
 
   const chatBox = document.getElementById("chats");
 
@@ -33,9 +39,6 @@ async function initializeWebSocket() {
       scrollToBottom();
     };
 
-    // get server bots
-    bots = await getBots();
-
     // handle chatBox on socket message event
     socket.onmessage = () => {
       handleMessage(chatBox);
@@ -46,11 +49,11 @@ async function initializeWebSocket() {
   else {
 
     socket.onopen = () => {
-      chatBox.innerHTML += `<div class="send-message">message encrypted: invalid decryption key, unable to decrypt the message</div>`;
+      chatBox.innerHTML += `<div class="send-message encrypted-message">message encrypted: invalid decryption key, unable to decrypt the message</div>`;
     };
 
     socket.onmessage = () => {
-      chatBox.innerHTML += `<div class="send-message">message encrypted: invalid decryption key, unable to decrypt the message</div>`;
+      chatBox.innerHTML += `<div class="send-message encrypted-message">message encrypted: invalid decryption key, unable to decrypt the message</div>`;
     };
   }
 }
@@ -70,10 +73,13 @@ function handleMessage(chatBox) {
 
     // "user joined" message
     if (data.startsWith("USER_JOINED: ")) {
-      const username = data.slice("USER_JOINED: ".length); // get the username of user
+      const clientUsername = data.slice("USER_JOINED: ".length); // get the username of user
 
       // update list of joined clients (clients) 
       clients = await updateClients();
+
+      // update list of joined clients (clients) 
+      bots = await getBots();
 
       // update allClients array
       allClients = [...clients, ...bots];
@@ -82,17 +88,19 @@ function handleMessage(chatBox) {
       renderList(allClients);
 
       // update message
-      chatBox.innerHTML += `<br><div class="user-joined">${username} joined the chat</div>`;
+      chatBox.innerHTML += `<br><div class="user-joined">${clientUsername} joined the chat</div>`;
 
       // enable send message
-      allowSentMessage = true;
+      if (clientUsername === username) {
+        allowSentMessage = true;
+      }
 
       playNotificationSfx();
     }
 
     // "user joined" message
     else if (data.startsWith("USER_LEFT: ")) {
-      const username = data.slice("USER_LEFT: ".length); // get the username of user
+      const clientUsername = data.slice("USER_LEFT: ".length); // get the username of user
 
       // update list of joined clients (clients) 
       clients = await updateClients();
@@ -104,15 +112,16 @@ function handleMessage(chatBox) {
       renderList(allClients);
 
       // disable send message
-      allowSentMessage = false;
+      if (clientUsername === username) {
+        allowSentMessage = false;
+      }
 
       // update message
-      chatBox.innerHTML += `<br><div class="user-left">${username} left the chat</div>`;
+      chatBox.innerHTML += `<br><div class="user-left">${clientUsername} left the chat</div>`;
     }
 
-    // regular message
+    // other message
     else {
-
 
       // get the normal to check weather the message is tagged or not
       const pattern = /<span class="username">(.+?) : &nbsp;<\/span> (.+)/;
@@ -136,6 +145,16 @@ function handleMessage(chatBox) {
           // calculator bot
           if (match[1] == 'calculator') {
             await calculator(parsedMessage, parsedUsername, data);
+          }
+
+          // translator bot
+          else if (match[1] == 'translator') {
+            await translator(parsedMessage, parsedUsername);
+          }
+
+          // compiler bot
+          else if (match[1] == 'compiler') {
+            await compiler(parsedMessage, parsedUsername);
           }
         }
 

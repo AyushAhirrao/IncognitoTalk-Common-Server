@@ -1,33 +1,35 @@
-const WebSocket = require("ws"); // Import the `ws` module
+// file handling
 const fs = require('fs');
 
+// security -encryption
 const CryptoJS = require('crypto-js');
 
+// server and endpoints
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 
+// socket-server
+const WebSocket = require("ws"); // Import the `ws` module
 const wss = new WebSocket.Server({
   // create a new WebSocket server
-  server
+  server,
+  path: '/socket'
 });
 
-app.use((req, res, next) => {
-
-  // Set CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  next();
+// set server status
+fs.writeFile('server/serverStatus.txt', ("server-opened"), (err) => {
+  if (err) throw err;
 });
-
 
 const clients = []; // Create an array to store connected clients
 
 let nicknames = []; // array on nicknames of joined clients to server 
 
-let bots = ["calculator"] // array of server bots
+let bots = ["calculator", "translator", "compiler"] // array of server bots
 
+
+// handle websocket 
 wss.on("connection", (ws) => {
   // When a new client connects
   console.log("client connected");
@@ -44,7 +46,6 @@ wss.on("connection", (ws) => {
       // update the nicknames array 
       await updateNicknames(message);
 
-      console.log(nicknames);
 
     }
   });
@@ -56,6 +57,82 @@ wss.on("connection", (ws) => {
     clients.splice(index, 1); // Remove the client from the array
   });
 });
+
+
+// handle routes
+app.use((req, res, next) => {
+
+  // Set CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+// Serve static files from the 'public' directory
+app.use(express.static('client/'));
+
+// host client 
+app.get('/', (req, res) => {
+  // validate server status 
+  const serverStatus = fs.readFileSync('serverStatus.txt', 'utf8').toString(); // the decryption key of server 
+
+  // if server status is closed
+  if (serverStatus == 'server-closed') {
+    fs.readFile('client/error.html', function (err, data) {
+      if (err) {
+        res.writeHead(500, {
+          'Content-Type': 'text/plain'
+        });
+        res.end('Error loading chat.html');
+      } else {
+        res.writeHead(200, {
+          'Content-Type': 'text/html'
+        });
+        res.end(data);
+      }
+    });
+  }
+
+  // if server status is opened
+  else {
+    fs.readFile('client/index.html', function (err, data) {
+      if (err) {
+        res.writeHead(500, {
+          'Content-Type': 'text/plain'
+        });
+        res.end('Error loading chat.html');
+      } else {
+        res.writeHead(200, {
+          'Content-Type': 'text/html'
+        });
+        res.end(data);
+      }
+    });
+  }
+})
+
+// end point for nicknames 
+// app.get('/compare-hash', (req, res) => {
+//   // get the real hash
+//   let serverHash = fs.readFileSync('encrypted-key.txt', 'utf8').toString();
+
+//   // get the client hash
+//   let clientHash = decodeURIComponent(req.query.hash);
+
+//   // if hash is matched then sent success (true)
+//   if (clientHash === serverHash) {
+//     res.send(JSON.stringify({
+//       success: true
+//     }));
+//   }
+//   // if hash is not matched then send !success (false)
+//   else {
+//     res.send(JSON.stringify({
+//       success: false
+//     }));
+//   }
+// });
 
 // end point for nicknames 
 app.get('/clients-joined', (req, res) => {
@@ -106,8 +183,9 @@ async function updateNicknames(message) {
   // remove all duplicate nicknames 
   nicknames = [...new Set(nicknames)];
 
-}
+  console.log(nicknames);
 
+}
 
 // listen on port 7772 (socket-server-port)
 server.listen(7772, () => {
